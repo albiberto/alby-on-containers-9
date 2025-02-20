@@ -1,0 +1,55 @@
+﻿# Build
+bin/
+obj/
+out/
+
+# Rider & Resharper
+.idea/
+*.sln.iml
+*.user
+*.suo
+*.userosscache
+*.sln.dotsettings
+*.sln.dotsettings.user
+*.csproj.user
+*.pidb
+*.DotSettings.user
+
+# Visual Studio
+.vs/
+*.vsp
+*.vspx
+*.vspscc
+*.vssscc
+*.ncb
+*.opendb
+*.pdb
+
+# Rider cache
+**/.idea/
+**/.idea_modules/
+**/.sln.iml
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+# Logs e dati temporanei
+*.log
+*.tmp
+*.cache
+*.bak
+
+# Configurazioni utente
+appsettings.Development.json
+secrets.json
+
+# System
+Thumbs.db
+ehthumbs.db
+desktop.ini
+.DS_Store
