@@ -2,11 +2,13 @@
 
 namespace AlbyOnContainers.ProductDataManager.Domain;
 
-public class Category(string name, string description, Guid? parentId = null, bool enabled = false, Guid id = default) : Entity(id, enabled)
+public class Category(string name, string description, Guid? parentId = null, bool enabled = false, Guid id = default)
+    : Entity(id, enabled)
 {
-    public string Name { get; } = name;
-    public string Description { get; } = description;
-    
-    public Guid? ParentId { get; } = parentId;
-    public Category? ParentCategory { get; private set; }
+    public Category() : this(string.Empty, string.Empty) { }
+
+    public string Name { get; private set; } = name;
+    public string Description { get; private set; } = description;
+    public Guid? ParentId { get; private set; } = parentId;
+    public Category? Parent { get; private set; }
 }
