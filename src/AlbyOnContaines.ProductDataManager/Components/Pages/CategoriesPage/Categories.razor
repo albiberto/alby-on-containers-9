@@ -1,0 +1,64 @@
+﻿@page "/categories"
+@using AlbyOnContainers.ProductDataManager.Domain
+@using AlbyOnContainers.ProductDataManager.Infrastructure
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Categories</PageTitle>
+<MudText Typo="Typo.h3" GutterBottom="true">Categories</MudText>
+
+<MudPaper Class="w-100" Elevation="0">
+    <MudTreeView ServerData="@LoadServerData" Items="@InitialTreeItems" Class="w-100">
+        <ItemTemplate Context="context">
+            <MudTreeViewItem
+                Value="@context.Value"
+                Items="@context.Children"
+                ItemsChanged="@(new Action<IReadOnlyCollection<TreeItemData<Category>>>(items => OnItemsLoaded(context, items)))"
+                @bind-Expanded="@context.Expanded"
+                CanExpand="@context.Expandable"
+                LoadingIconColor="Color.Info">
+                <BodyContent Context="item">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <div class="d-flex flex-grow-1 align-items-center gap-3">
+                            <MudText>@item.Value.Name</MudText>
+                            <MudText>@item.Value.Description</MudText>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit"/>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit"/>
+                        </div>
+                    </div>
+                </BodyContent>
+            </MudTreeViewItem>
+        </ItemTemplate>
+    </MudTreeView>
+</MudPaper>
+
+@code {
+
+    [Inject] ProductContext Context { get; set; } = null!;
+
+    private List<TreeItemData<Category>> InitialTreeItems { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        InitialTreeItems = await Context.Categories
+                               .Where(c => c.ParentId == null)
+                               .Select(category => new TreeItemData<Category>
+                               {
+                                   Value = category
+                               })
+                               .ToListAsync();
+    }
+
+    async Task<IReadOnlyCollection<TreeItemData<Category>>> LoadServerData(Category parent) =>
+        await Context.Categories
+            .Where(c => c.ParentId == parent.Id)
+            .Select(category => new TreeItemData<Category>
+            {
+                Value = category
+            })
+            .ToListAsync();
+
+    private static void OnItemsLoaded(TreeItemData<Category> treeItemData, IReadOnlyCollection<TreeItemData<Category?>>? children) =>
+        treeItemData.Children = children?.ToList() ?? [];
+}

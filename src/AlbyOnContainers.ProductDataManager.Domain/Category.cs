@@ -1,4 +1,5 @@
-﻿using AlbyOnContainers.ProductDataManager.Domain.Seeds;
+﻿using System.Collections.Frozen;
+using AlbyOnContainers.ProductDataManager.Domain.Seeds;
 
 namespace AlbyOnContainers.ProductDataManager.Domain;
 
@@ -11,4 +12,7 @@ public class Category(string name, string description, Guid? parentId = null, bo
     public string Description { get; private set; } = description;
     public Guid? ParentId { get; private set; } = parentId;
     public Category? Parent { get; private set; }
+
+    List<Category> _children = [];
+    public ICollection<Category> Children => _children;
 }

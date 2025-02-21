@@ -5,5 +5,5 @@ namespace AlbyOnContainers.ProductDataManager.Infrastructure;
 
 public class ProductContext(DbContextOptions<ProductContext> options) : DbContext(options)
 {
-    private DbSet<Category> Categories { get; set; }
+    public DbSet<Category> Categories { get; set; }
 }
