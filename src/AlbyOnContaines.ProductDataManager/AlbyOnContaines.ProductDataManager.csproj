@@ -14,10 +14,13 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="MudBlazor" Version="8.*" />
+    <PackageReference Include="Scrutor" Version="6.0.1" />
   </ItemGroup>
 
 
   <ItemGroup>
+    <ProjectReference Include="..\..\AlbyOnContainers.ProductDataManager.Commands\AlbyOnContainers.ProductDataManager.Commands.csproj" />
+    <ProjectReference Include="..\..\AlbyOnContainers.ProductDataManager.Queries\AlbyOnContainers.ProductDataManager.Queries.csproj" />
     <ProjectReference Include="..\AlbyOnContainers.ProductDataManager.Infrastructure\AlbyOnContainers.ProductDataManager.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

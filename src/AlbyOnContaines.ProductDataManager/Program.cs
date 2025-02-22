@@ -1,4 +1,5 @@
 using AlbyOnContainers.ProductDataManager.Infrastructure;
+using AlbyOnContaines.ProductDataManager;
 using MudBlazor.Services;
 using AlbyOnContaines.ProductDataManager.Components;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +13,7 @@ builder.Services.AddMudServices();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddDbContext<ProductContext>(options =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("ProductConnection");
-    options.UseNpgsql(connectionString);
-});
+builder.AddServices();
 
 var app = builder.Build();
 

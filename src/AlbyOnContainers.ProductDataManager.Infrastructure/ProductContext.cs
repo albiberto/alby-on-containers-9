@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AlbyOnContainers.ProductDataManager.Infrastructure;
 
-public class ProductContext(DbContextOptions<ProductContext> options) : DbContext(options)
+public class ProductContext(DbContextOptions<ProductContext> options) : DbContext(options), IUnitOfWork
 {
     public DbSet<Category> Categories { get; set; }
 }

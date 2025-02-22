@@ -1,13 +1,12 @@
 ﻿@page "/categories"
 @using AlbyOnContainers.ProductDataManager.Domain
-@using AlbyOnContainers.ProductDataManager.Infrastructure
-@using Microsoft.EntityFrameworkCore
+@using AlbyOnContainers.ProductDataManager.Queries
 
 <PageTitle>Categories</PageTitle>
 <MudText Typo="Typo.h3" GutterBottom="true">Categories</MudText>
 
 <MudPaper Class="w-100" Elevation="0">
-    <MudTextField T="string" Label="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" TextChanged="OnTextChanged" Immediate="true" Clearable="true" />
+    <MudTextField T="string" Label="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" TextChanged="OnTextChanged" Immediate="true" Clearable="true"/>
     <MudTreeView @ref="_treeView" ServerData="@LoadServerData" Items="@InitialTreeItems" FilterFunc="MatchesName" Class="w-100">
         <ItemTemplate Context="context">
             <MudTreeViewItem
@@ -21,7 +20,7 @@
                     <EditDisplay>
                         <MudText>@item.Value!.Name</MudText>
                         <MudText>@item.Value!.Description</MudText>
-                    </EditDisplay>           
+                    </EditDisplay>
                 </BodyContent>
             </MudTreeViewItem>
         </ItemTemplate>
@@ -29,59 +28,27 @@
 </MudPaper>
 
 @code {
-    [Inject] ProductContext Context { get; set; } = null!;
-    [Inject] ISnackbar Snackbar { get; set; } = null!; // For notifications
+    [Inject] CategoryQueries Queries { get; set; } = null!;
+    [Inject] ISnackbar Snackbar { get; set; } = null!;
 
     private List<TreeItemData<Category>> InitialTreeItems { get; set; } = [];
     private MudTreeView<Category>? _treeView;
     private string _searchPhrase = string.Empty;
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            InitialTreeItems = await LoadRootCategories();
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Error loading categories: {ex.Message}", Severity.Error);
-        }
-    }
+    protected override async Task OnInitializedAsync() => InitialTreeItems = await Queries.GetAllParents();
 
-    async Task<List<TreeItemData<Category>>> LoadRootCategories() =>
-        await Context.Categories
-            .Where(c => c.ParentId == null)
-            .Include(c => c.Children)
-            .Select(category => new TreeItemData<Category>
-            {
-                Text = category.Name,
-                Value = category,
-                Expandable = category.HasChildren
-            })
-            .ToListAsync();
-
-    async Task<IReadOnlyCollection<TreeItemData<Category>>> LoadServerData(Category parent) =>
-        await Context.Categories
-            .Where(c => c.ParentId == parent.Id)
-            .Include(c => c.Children)
-            .Select(category => new TreeItemData<Category>
-            {
-                Text = category.Name,
-                Value = category,
-                Expandable = category.HasChildren
-            })
-            .ToListAsync();
+    async Task<IReadOnlyCollection<TreeItemData<Category>>> LoadServerData(Category parent) => await Queries.GetAllChildren(parent.Id);
 
     static void OnItemsLoaded(TreeItemData<Category> treeItemData, IReadOnlyCollection<TreeItemData<Category?>>? children) =>
         treeItemData.Children = children?.ToList() ?? [];
 
-    async void OnTextChanged(string searchPhrase)
+    async Task OnTextChanged(string searchPhrase)
     {
         _searchPhrase = searchPhrase;
         if (_treeView is not null) await _treeView.FilterAsync();
     }
 
-    private Task<bool> MatchesName(TreeItemData<Category> item) => 
+    private Task<bool> MatchesName(TreeItemData<Category> item) =>
         Task.FromResult(string.IsNullOrEmpty(item.Text) || item.Text.Contains(_searchPhrase, StringComparison.OrdinalIgnoreCase));
 
     private void EditCategory(Category category)
@@ -97,4 +64,5 @@
         Console.WriteLine($"Deleting category: {category.Name}");
         Snackbar.Add($"Deleting {category.Name}", Severity.Warning); // Example notification
     }
+
 }
