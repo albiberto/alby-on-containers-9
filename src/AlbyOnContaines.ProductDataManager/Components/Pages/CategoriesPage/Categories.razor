@@ -7,7 +7,8 @@
 <MudText Typo="Typo.h3" GutterBottom="true">Categories</MudText>
 
 <MudPaper Class="w-100" Elevation="0">
-    <MudTreeView ServerData="@LoadServerData" Items="@InitialTreeItems" Class="w-100">
+    <MudTextField T="string" Label="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" TextChanged="OnTextChanged" Immediate="true" Clearable="true" />
+    <MudTreeView @ref="_treeView" ServerData="@LoadServerData" Items="@InitialTreeItems" FilterFunc="MatchesName" Class="w-100">
         <ItemTemplate Context="context">
             <MudTreeViewItem
                 Value="@context.Value"
@@ -17,16 +18,10 @@
                 CanExpand="@context.Expandable"
                 LoadingIconColor="Color.Info">
                 <BodyContent Context="item">
-                    <div class="d-flex justify-content-between align-items-center w-100">
-                        <div class="d-flex flex-grow-1 align-items-center gap-3">
-                            <MudText>@item.Value.Name</MudText>
-                            <MudText>@item.Value.Description</MudText>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit"/>
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit"/>
-                        </div>
-                    </div>
+                    <EditDisplay>
+                        <MudText>@item.Value!.Name</MudText>
+                        <MudText>@item.Value!.Description</MudText>
+                    </EditDisplay>           
                 </BodyContent>
             </MudTreeViewItem>
         </ItemTemplate>
@@ -34,31 +29,72 @@
 </MudPaper>
 
 @code {
-
     [Inject] ProductContext Context { get; set; } = null!;
+    [Inject] ISnackbar Snackbar { get; set; } = null!; // For notifications
 
     private List<TreeItemData<Category>> InitialTreeItems { get; set; } = [];
+    private MudTreeView<Category>? _treeView;
+    private string _searchPhrase = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        InitialTreeItems = await Context.Categories
-                               .Where(c => c.ParentId == null)
-                               .Select(category => new TreeItemData<Category>
-                               {
-                                   Value = category
-                               })
-                               .ToListAsync();
+        try
+        {
+            InitialTreeItems = await LoadRootCategories();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading categories: {ex.Message}", Severity.Error);
+        }
     }
+
+    async Task<List<TreeItemData<Category>>> LoadRootCategories() =>
+        await Context.Categories
+            .Where(c => c.ParentId == null)
+            .Include(c => c.Children)
+            .Select(category => new TreeItemData<Category>
+            {
+                Text = category.Name,
+                Value = category,
+                Expandable = category.HasChildren
+            })
+            .ToListAsync();
 
     async Task<IReadOnlyCollection<TreeItemData<Category>>> LoadServerData(Category parent) =>
         await Context.Categories
             .Where(c => c.ParentId == parent.Id)
+            .Include(c => c.Children)
             .Select(category => new TreeItemData<Category>
             {
-                Value = category
+                Text = category.Name,
+                Value = category,
+                Expandable = category.HasChildren
             })
             .ToListAsync();
 
-    private static void OnItemsLoaded(TreeItemData<Category> treeItemData, IReadOnlyCollection<TreeItemData<Category?>>? children) =>
+    static void OnItemsLoaded(TreeItemData<Category> treeItemData, IReadOnlyCollection<TreeItemData<Category?>>? children) =>
         treeItemData.Children = children?.ToList() ?? [];
+
+    async void OnTextChanged(string searchPhrase)
+    {
+        _searchPhrase = searchPhrase;
+        if (_treeView is not null) await _treeView.FilterAsync();
+    }
+
+    private Task<bool> MatchesName(TreeItemData<Category> item) => 
+        Task.FromResult(string.IsNullOrEmpty(item.Text) || item.Text.Contains(_searchPhrase, StringComparison.OrdinalIgnoreCase));
+
+    private void EditCategory(Category category)
+    {
+        // Implement edit logic here (e.g., open a dialog)
+        Console.WriteLine($"Editing category: {category.Name}");
+        Snackbar.Add($"Editing {category.Name}", Severity.Info); // Example notification
+    }
+
+    private void DeleteCategory(Category category)
+    {
+        // Implement delete logic here (e.g., confirmation dialog, database removal)
+        Console.WriteLine($"Deleting category: {category.Name}");
+        Snackbar.Add($"Deleting {category.Name}", Severity.Warning); // Example notification
+    }
 }

@@ -1,0 +1,20 @@
+﻿<div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+    <div style="display: flex; gap: 1.25rem;">
+        @ChildContent
+    </div>
+
+    <!-- Pulsanti -->
+    <div style="display: flex; gap: 1rem;">
+        <MudIconButton Icon="@Icons.Material.Outlined.AddCircleOutline" Size="Size.Medium" Color="Color.Inherit" OnClick="() => Add()"/>
+        <MudIconButton Icon="@Icons.Material.Outlined.Edit" Size="Size.Medium" Color="Color.Inherit" OnClick="() => Edit()"/>
+        <MudIconButton Icon="@Icons.Material.Outlined.Delete" Size="Size.Medium" Color="Color.Inherit" OnClick="() => Delete()"/>
+    </div>
+</div>
+
+@code {
+    [Parameter] public required RenderFragment ChildContent { get; set; }
+    
+    private void Add() => Console.WriteLine("Aggiungi");
+    private void Edit() => Console.WriteLine("Modifica");
+    private void Delete() => Console.WriteLine("Elimina");
+}
