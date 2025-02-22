@@ -20,7 +20,7 @@
                 CanExpand="@context.Expandable"
                 LoadingIconColor="Color.Info">
                 <BodyContent Context="item">
-                    <EditDisplay>
+                    <EditDisplay Parent="@item.Value">
                         <MudText>@item.Value!.Name</MudText>
                         <MudText>@item.Value!.Description</MudText>
                     </EditDisplay>
@@ -68,6 +68,6 @@
 
         if (result?.Canceled ?? false) return;
         
-        await Commands.CreateRootCategory(category);
+        await Commands.CreateRootCategoryAsync(category);
     }
 }

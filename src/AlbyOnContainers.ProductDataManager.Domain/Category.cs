@@ -17,4 +17,6 @@ public class Category(string name, string description, Guid? parentId = null, bo
     public ICollection<Category> Children => _children;
 
     public bool HasChildren => _children.Count > 0;
+
+    public void AddCategory(Category child) => _children.Add(child);
 }
