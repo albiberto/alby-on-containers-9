@@ -18,7 +18,13 @@ public static class Bootstrapper
     {
         builder.Services.Scan(scan => scan
                                   .FromAssemblyOf<CategoryQueries>()
-                                  .AddClasses(classes => classes.InExactNamespaceOf(typeof(CategoryQueries), typeof(CategoryCommands)))
+                                  .AddClasses(classes => classes.InExactNamespaceOf<CategoryQueries>())
+                                  .AsSelf()
+                                  .WithScopedLifetime());
+        
+        builder.Services.Scan(scan => scan
+                                  .FromAssemblyOf<CategoryCommands>()
+                                  .AddClasses(classes => classes.InExactNamespaceOf<CategoryCommands>())
                                   .AsSelf()
                                   .WithScopedLifetime());
         

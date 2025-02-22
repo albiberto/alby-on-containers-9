@@ -8,8 +8,8 @@ public class Category(string name, string description, Guid? parentId = null, bo
 {
     public Category() : this(string.Empty, string.Empty) { }
 
-    public string Name { get; private set; } = name;
-    public string Description { get; private set; } = description;
+    public string Name { get; set; } = name;
+    public string Description { get; set; } = description;
     public Guid? ParentId { get; private set; } = parentId;
     public Category? Parent { get; private set; }
 

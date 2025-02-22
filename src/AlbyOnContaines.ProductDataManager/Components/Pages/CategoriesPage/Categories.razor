@@ -1,9 +1,12 @@
 ﻿@page "/categories"
+@using AlbyOnContainers.ProductDataManager.Commands
 @using AlbyOnContainers.ProductDataManager.Domain
 @using AlbyOnContainers.ProductDataManager.Queries
 
 <PageTitle>Categories</PageTitle>
 <MudText Typo="Typo.h3" GutterBottom="true">Categories</MudText>
+
+<MudButton OnClick="@(() => OpenCategoryDialog("Create Category"))" Variant="Variant.Outlined" Color="Color.Primary" EndIcon="@Icons.Material.Outlined.AddCircleOutline">Add Category</MudButton>
 
 <MudPaper Class="w-100" Elevation="0">
     <MudTextField T="string" Label="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" TextChanged="OnTextChanged" Immediate="true" Clearable="true"/>
@@ -29,7 +32,9 @@
 
 @code {
     [Inject] CategoryQueries Queries { get; set; } = null!;
+    [Inject] CategoryCommands Commands { get; set; } = null!;
     [Inject] ISnackbar Snackbar { get; set; } = null!;
+    [Inject] IDialogService Dialog { get; set; } = null!;
 
     private List<TreeItemData<Category>> InitialTreeItems { get; set; } = [];
     private MudTreeView<Category>? _treeView;
@@ -51,18 +56,18 @@
     private Task<bool> MatchesName(TreeItemData<Category> item) =>
         Task.FromResult(string.IsNullOrEmpty(item.Text) || item.Text.Contains(_searchPhrase, StringComparison.OrdinalIgnoreCase));
 
-    private void EditCategory(Category category)
+    private async Task OpenCategoryDialog(string title, Category? category = null)
     {
-        // Implement edit logic here (e.g., open a dialog)
-        Console.WriteLine($"Editing category: {category.Name}");
-        Snackbar.Add($"Editing {category.Name}", Severity.Info); // Example notification
-    }
+        category ??= new();
+        
+        var parameters = new DialogParameters<CategoryDialog> { { x => x.Category, category } };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        
+        var dialog = await Dialog.ShowAsync<CategoryDialog>(title, parameters, options);
+        var result = await dialog.Result;
 
-    private void DeleteCategory(Category category)
-    {
-        // Implement delete logic here (e.g., confirmation dialog, database removal)
-        Console.WriteLine($"Deleting category: {category.Name}");
-        Snackbar.Add($"Deleting {category.Name}", Severity.Warning); // Example notification
+        if (result?.Canceled ?? false) return;
+        
+        await Commands.CreateRootCategory(category);
     }
-
 }

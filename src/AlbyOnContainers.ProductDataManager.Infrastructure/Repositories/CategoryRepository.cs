@@ -10,4 +10,8 @@ public class CategoryRepository(ProductContext context): ICategoryRepository
             .Where(c => c.ParentId == parentId)
             .Include(c => c.Children)
             .AsAsyncEnumerable();
+
+    public async Task CreateAsync(Category category) => await context.AddAsync(category);
+
+    public Task<int> SaveChangesAsync() => context.SaveChangesAsync();
 }

@@ -1,0 +1,44 @@
+﻿@using AlbyOnContainers.ProductDataManager.Domain
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.DeleteForever" Class="mr-3 mb-n1"/>
+            Delete server?
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <div class="d-flex flex-column">
+            @if (Category.Id != Guid.Empty)
+            {
+                <MudTextField Value="@Category.Id.ToString()" Label="Identifier" ReadOnly="true"/>
+            }
+            <MudTextField @bind-Value="@Category.Name" Label="Name" Placeholder="Insert category name" Class="pt-2" Clearable="true" MaxLength="30"/>
+            <MudTextField @bind-Value="@Category.Description" Label="Description" Placeholder="Insert category description" Class="pt-2" Clearable="true" MaxLength="512"/>
+            <MudCheckBox T="bool" Value="@Category.Enabled" Label="Enabled" ValueChanged="EnableChanged" Class="align-self-end pt-2" Color="Color.Primary"></MudCheckBox>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public required IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public required Category Category { get; set; }
+
+    private void EnableChanged(bool @checked)
+    {
+        if (@checked)
+            Category.Enable();
+        else
+            Category.Disable();
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void Save() => MudDialog.Close(DialogResult.Ok(Category.Id));
+}
