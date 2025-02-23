@@ -1,14 +1,7 @@
 ﻿@using AlbyOnContainers.ProductDataManager.Domain
 @using AlbyOnContainers.ProductDataManager.Queries
-@inject ISnackbar Snackbar
 
 <MudDialog>
-    <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Icon="@Icons.Material.Filled.DeleteForever" Class="mr-3 mb-n1"/>
-            Delete server?
-        </MudText>
-    </TitleContent>
     <DialogContent>
         <div class="d-flex flex-column">
             @if (Category.Id != Guid.Empty)
@@ -23,13 +16,13 @@
                 <MudSelectItem Value="false">No</MudSelectItem>
             </MudSelect>
             
-            @* <MudSelect T="Guid?" Label="Parent" @bind-Value="Category.ParentId"> *@
-            @*     <MudSelectItem Value="@null">Root</MudSelectItem> *@
-            @*     @foreach (var (id, name) in _all) *@
-            @*     { *@
-            @*         <MudSelectItem Value="@id">@name</MudSelectItem> *@
-            @*     } *@
-            @* </MudSelect> *@
+            <MudSelect T="Guid" Label="Parent" Value="@SelectedParent(Category.ParentId)" ValueChanged="ParentChanged">
+                @foreach (var (id, name) in _all)
+                {
+                    <MudSelectItem Value="@id">@name</MudSelectItem>
+                }
+            </MudSelect>
+
         </div>
     </DialogContent>
     <DialogActions>
@@ -55,7 +48,9 @@
             Category.Disable();
     }
 
-    private void Cancel() => MudDialog.Cancel();
-
-    private void Save() => MudDialog.Close(DialogResult.Ok(Category.Id));
+    static Guid SelectedParent(Guid? guid) => guid ?? Guid.Empty;
+    
+    void ParentChanged(Guid parent) => Category.ParentId = parent == Guid.Empty ? null : parent;
+    void Cancel() => MudDialog.Cancel();
+    void Save() => MudDialog.Close(DialogResult.Ok(Category.Id));
 }
