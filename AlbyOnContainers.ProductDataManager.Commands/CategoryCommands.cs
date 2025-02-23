@@ -10,9 +10,5 @@ public class CategoryCommands(ICategoryRepository repository)
         await repository.SaveChangesAsync();
     }
     
-    public async Task CreateChildCategoryAsync(Category parent, Category child)
-    {
-        parent.AddCategory(child);
-        await repository.SaveChangesAsync();
-    }
+    public Task UpdateRootCategoryAsync() => repository.SaveChangesAsync();
 }

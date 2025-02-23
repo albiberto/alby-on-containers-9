@@ -11,7 +11,7 @@ public static class Bootstrapper
 {
     public static void AddServices(this IHostApplicationBuilder builder)
     {
-        builder.Services.AddScoped<DialogService>();
+        builder.Services.AddScoped<CategoryDialogService>();
         
         builder.AddInfrastructure();
         builder.AddCqrs();
