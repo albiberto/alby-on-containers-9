@@ -2,6 +2,7 @@
 using AlbyOnContainers.ProductDataManager.Infrastructure;
 using AlbyOnContainers.ProductDataManager.Infrastructure.Repositories;
 using AlbyOnContainers.ProductDataManager.Queries;
+using AlbyOnContaines.ProductDataManager.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace AlbyOnContaines.ProductDataManager;
@@ -10,6 +11,8 @@ public static class Bootstrapper
 {
     public static void AddServices(this IHostApplicationBuilder builder)
     {
+        builder.Services.AddScoped<DialogService>();
+        
         builder.AddInfrastructure();
         builder.AddCqrs();
     }

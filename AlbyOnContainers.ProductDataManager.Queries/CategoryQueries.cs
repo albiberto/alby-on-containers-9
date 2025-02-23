@@ -11,6 +11,11 @@ public class CategoryQueries(ICategoryRepository repository)
     public Task<List<TreeItemData<Category>>> GetAllChildren(Guid parentId) => 
         GetAll(() => repository.GetAllChildren(parentId));
 
+    public async Task<List<(Guid Id, string Name)>> GetAllCategoriesNames() =>
+        await repository.GetAll()
+            .Select(category => (category.Id, category.Name))
+            .ToListAsync();
+    
     static async Task<List<TreeItemData<Category>>> GetAll(Func<IAsyncEnumerable<Category>> selector) =>
         await selector()
             .Select(category => new TreeItemData<Category>

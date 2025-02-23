@@ -1,4 +1,5 @@
 ﻿@using AlbyOnContainers.ProductDataManager.Domain
+@using AlbyOnContainers.ProductDataManager.Queries
 @inject ISnackbar Snackbar
 
 <MudDialog>
@@ -16,7 +17,19 @@
             }
             <MudTextField @bind-Value="@Category.Name" Label="Name" Placeholder="Insert category name" Class="pt-2" Clearable="true" MaxLength="30"/>
             <MudTextField @bind-Value="@Category.Description" Label="Description" Placeholder="Insert category description" Class="pt-2" Clearable="true" MaxLength="512"/>
-            <MudCheckBox T="bool" Value="@Category.Enabled" Label="Enabled" ValueChanged="EnableChanged" Class="align-self-end pt-2" Color="Color.Primary"></MudCheckBox>
+            
+            <MudSelect T="bool" Value="@Category.Enabled" ValueChanged="EnableChanged" Label="Enabled" Class="pt-2">
+                <MudSelectItem Value="true">Yes</MudSelectItem>
+                <MudSelectItem Value="false">No</MudSelectItem>
+            </MudSelect>
+            
+            @* <MudSelect T="Guid?" Label="Parent" @bind-Value="Category.ParentId"> *@
+            @*     <MudSelectItem Value="@null">Root</MudSelectItem> *@
+            @*     @foreach (var (id, name) in _all) *@
+            @*     { *@
+            @*         <MudSelectItem Value="@id">@name</MudSelectItem> *@
+            @*     } *@
+            @* </MudSelect> *@
         </div>
     </DialogContent>
     <DialogActions>
@@ -26,9 +39,13 @@
 </MudDialog>
 
 @code {
+    [Inject] CategoryQueries Queries { get; set; } = null!;
     [CascadingParameter] public required IMudDialogInstance MudDialog { get; set; }
-
     [Parameter] public required Category Category { get; set; }
+
+    List<(Guid Id, string Name)> _all = [];
+
+    protected override async Task OnInitializedAsync() => _all = await Queries.GetAllCategoriesNames();
 
     private void EnableChanged(bool @checked)
     {

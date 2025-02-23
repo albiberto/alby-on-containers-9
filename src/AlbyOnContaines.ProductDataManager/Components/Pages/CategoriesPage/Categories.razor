@@ -2,11 +2,12 @@
 @using AlbyOnContainers.ProductDataManager.Commands
 @using AlbyOnContainers.ProductDataManager.Domain
 @using AlbyOnContainers.ProductDataManager.Queries
+@using AlbyOnContaines.ProductDataManager.Components.Shared
 
 <PageTitle>Categories</PageTitle>
 <MudText Typo="Typo.h3" GutterBottom="true">Categories</MudText>
 
-<MudButton OnClick="@(() => OpenCategoryDialog("Create Category"))" Variant="Variant.Outlined" Color="Color.Primary" EndIcon="@Icons.Material.Outlined.AddCircleOutline">Add Category</MudButton>
+<MudButton OnClick="@(() => Dialog.OpenCategoryDialog("Creare Category", category => Commands.CreateRootCategoryAsync(category)))" Variant="Variant.Outlined" Color="Color.Primary" EndIcon="@Icons.Material.Outlined.AddCircleOutline">Add Category</MudButton>
 
 <MudPaper Class="w-100" Elevation="0">
     <MudTextField T="string" Label="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" TextChanged="OnTextChanged" Immediate="true" Clearable="true"/>
@@ -20,7 +21,8 @@
                 CanExpand="@context.Expandable"
                 LoadingIconColor="Color.Info">
                 <BodyContent Context="item">
-                    <EditDisplay Parent="@item.Value">
+                    <EditDisplay 
+                        OpenDialog="@(() => Dialog.OpenCategoryDialog("Creare Category", category => Commands.CreateChildCategoryAsync(item.Value!, category)))">
                         <MudText>@item.Value!.Name</MudText>
                         <MudText>@item.Value!.Description</MudText>
                     </EditDisplay>
@@ -34,11 +36,11 @@
     [Inject] CategoryQueries Queries { get; set; } = null!;
     [Inject] CategoryCommands Commands { get; set; } = null!;
     [Inject] ISnackbar Snackbar { get; set; } = null!;
-    [Inject] IDialogService Dialog { get; set; } = null!;
+    [Inject] Services.DialogService Dialog { get; set; } = null!;
 
-    private List<TreeItemData<Category>> InitialTreeItems { get; set; } = [];
-    private MudTreeView<Category>? _treeView;
-    private string _searchPhrase = string.Empty;
+    List<TreeItemData<Category>> InitialTreeItems { get; set; } = [];
+    MudTreeView<Category>? _treeView;
+    string _searchPhrase = string.Empty;
 
     protected override async Task OnInitializedAsync() => InitialTreeItems = await Queries.GetAllParents();
 
@@ -53,21 +55,6 @@
         if (_treeView is not null) await _treeView.FilterAsync();
     }
 
-    private Task<bool> MatchesName(TreeItemData<Category> item) =>
+    Task<bool> MatchesName(TreeItemData<Category> item) =>
         Task.FromResult(string.IsNullOrEmpty(item.Text) || item.Text.Contains(_searchPhrase, StringComparison.OrdinalIgnoreCase));
-
-    private async Task OpenCategoryDialog(string title, Category? category = null)
-    {
-        category ??= new();
-        
-        var parameters = new DialogParameters<CategoryDialog> { { x => x.Category, category } };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
-        
-        var dialog = await Dialog.ShowAsync<CategoryDialog>(title, parameters, options);
-        var result = await dialog.Result;
-
-        if (result?.Canceled ?? false) return;
-        
-        await Commands.CreateRootCategoryAsync(category);
-    }
 }

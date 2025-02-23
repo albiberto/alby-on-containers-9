@@ -1,6 +1,6 @@
 ﻿namespace AlbyOnContainers.ProductDataManager.Domain.Seeds;
 
-public abstract class Entity(Guid id, bool enabled, string? createdBy = null, DateTime? createdAt = null, string updatedBy = null, DateTime? updatedAt = null)
+public abstract class Entity(Guid id, bool enabled = true, string? createdBy = null, DateTime? createdAt = null, string? updatedBy = null, DateTime? updatedAt = null)
     : Auditable(createdBy, createdAt, updatedBy, updatedAt)
 {
     public Guid Id { get; private set; } = id;
