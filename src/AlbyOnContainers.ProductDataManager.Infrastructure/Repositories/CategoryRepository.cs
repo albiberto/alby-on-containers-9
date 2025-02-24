@@ -1,23 +1,6 @@
 ﻿using AlbyOnContainers.ProductDataManager.Domain;
-using Microsoft.EntityFrameworkCore;
+using Ardalis.Specification.EntityFrameworkCore;
 
 namespace AlbyOnContainers.ProductDataManager.Infrastructure.Repositories;
 
-public class CategoryRepository(ProductContext context): ICategoryRepository
-{
-    public IAsyncEnumerable<Category> GetAll() =>
-        context.Categories
-            .AsAsyncEnumerable();
-    
-    public IAsyncEnumerable<Category> GetAllChildren(Guid? parentId = null) =>
-        context.Categories
-            .Where(c => c.ParentId == parentId)
-            .Include(c => c.Children)
-            .AsAsyncEnumerable();
-
-    public async Task CreateAsync(Category category) => await context.AddAsync(category);
-
-    public void DeleteAsync(Category category) => context.Categories.Remove(category);
-
-    public Task<int> SaveChangesAsync() => context.SaveChangesAsync();
-}
+public class CategoryRepository(ProductContext dbContext) : RepositoryBase<Category>(dbContext);

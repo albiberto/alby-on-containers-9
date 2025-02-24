@@ -1,5 +1,4 @@
 ﻿@using AlbyOnContainers.ProductDataManager.Domain
-@using AlbyOnContainers.ProductDataManager.Queries
 
 <MudDialog>
     <DialogContent>
@@ -17,9 +16,9 @@
             </MudSelect>
             
             <MudSelect T="Guid" Label="Parent" Value="@SelectedParent(Category.ParentId)" ValueChanged="ParentChanged">
-                @foreach (var (id, name) in _all)
+                @foreach (var category in Categories.Where(category => category.Id != Category.Id))
                 {
-                    <MudSelectItem Value="@id">@name</MudSelectItem>
+                    <MudSelectItem Value="@category.Id">@category.Name</MudSelectItem>
                 }
             </MudSelect>
 
@@ -32,13 +31,9 @@
 </MudDialog>
 
 @code {
-    [Inject] CategoryQueries Queries { get; set; } = null!;
     [CascadingParameter] public required IMudDialogInstance MudDialog { get; set; }
     [Parameter] public required Category Category { get; set; }
-
-    List<(Guid Id, string Name)> _all = [];
-
-    protected override async Task OnInitializedAsync() => _all = await Queries.GetAllCategoriesNames();
+    [Parameter] public required IReadOnlyCollection<Category> Categories { get; set; } = [];
 
     private void EnableChanged(bool @checked)
     {

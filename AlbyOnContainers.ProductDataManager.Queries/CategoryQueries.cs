@@ -23,32 +23,7 @@ public class CategoryQueries(ICategoryRepository repository)
         return categories;
     }
 
-    public async IAsyncEnumerable<TreeItemData<Category>> GetAllHierarchy()
-    {
-        var categories = await repository.GetAll().OrderBy(c => c.ParentId != null).ToListAsync();
-        var lookup = categories.ToLookup(c => c.ParentId);
     
-        async IAsyncEnumerable<TreeItemData<Category>> BuildTree(Guid? parentId)
-        {
-            foreach (var category in lookup[parentId].OrderBy(c => c.Name))
-            {
-                var children = await BuildTree(category.Id).ToListAsync();
-                var item = new TreeItemData<Category>
-                {
-                    Text = category.Name,
-                    Value = category,
-                    Expandable = children.Any(),
-                    Children = children.ToList()
-                };
-                yield return item;
-            }
-        }
-    
-        await foreach (var item in BuildTree(null))
-        {
-            yield return item;
-        }
-    }
 
 
 

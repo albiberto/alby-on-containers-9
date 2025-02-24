@@ -1,7 +1,6 @@
 ﻿@page "/categories"
-@using AlbyOnContainers.ProductDataManager.Commands
 @using AlbyOnContainers.ProductDataManager.Domain
-@using AlbyOnContainers.ProductDataManager.Queries
+@using AlbyOnContainers.ProductDataManager.Infrastructure.Repositories
 @using AlbyOnContaines.ProductDataManager.Components.Shared
 @using AlbyOnContaines.ProductDataManager.Services
 
@@ -10,18 +9,17 @@
 
 <div class="d-flex flex-row reverse">
  <MudButton OnClick="@(() => OpenCreateCategoryDialog())" Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Outlined.AddCircleOutline">Add Category</MudButton>
- <MudButton OnClick="@ExpandAll" Color="Color.Secondary"  Variant="Variant.Text">Expand All</MudButton>
- <MudButton OnClick="@CollapseAll" Color="Color.Secondary" Variant="Variant.Text">Collapse All</MudButton>
+ @* <MudButton OnClick="@ExpandAll" Color="Color.Secondary"  Variant="Variant.Text">Expand All</MudButton> *@
+ @* <MudButton OnClick="@CollapseAll" Color="Color.Secondary" Variant="Variant.Text">Collapse All</MudButton> *@
 </div>
 
 <MudPaper Class="w-100" Elevation="0">
     <MudTextField T="string" Label="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" TextChanged="OnTextChanged" Immediate="false" Clearable="true"/>
-    <MudTreeView @ref="_treeView" ServerData="@LoadServerData" Items="@InitialTreeItems" FilterFunc="MatchesName" Class="w-100">
+    <MudTreeView @ref="_treeView" Items="@_items" FilterFunc="MatchesName" Class="w-100">
         <ItemTemplate Context="context">
             <MudTreeViewItem
                 Value="@context.Value"
                 Items="@context.Children"
-                ItemsChanged="@(new Action<IReadOnlyCollection<TreeItemData<Category>>>(items => OnItemsLoaded(context, items)))"
                 @bind-Expanded="@context.Expanded"
                 CanExpand="@context.Expandable"
                 LoadingIconColor="Color.Info">
@@ -53,27 +51,51 @@
 </MudPaper>
 
 @code {
-    [Inject] CategoryQueries Queries { get; set; } = null!;
-    [Inject] CategoryCommands Commands { get; set; } = null!;
+    [Inject] CategoryRepository CategoryRepository { get; set; } = null!;
     [Inject] ISnackbar Snackbar { get; set; } = null!;
     [Inject] CategoryDialogService CategoryDialogService { get; set; } = null!;
 
     MudTreeView<Category>? _treeView;
-    List<TreeItemData<Category>> InitialTreeItems { get; set; } = [];
+
+    List<TreeItemData<Category>> _items = [];
+    List<Category> _categories = [];
+
     string _searchPhrase = string.Empty;
+    
 
     protected override async Task OnInitializedAsync()
     {
-        // InitialTreeItems = await Queries.GetAllHierarchy().ToListAsync();
-
-        InitialTreeItems = await Queries.GetAllParents().ToListAsync();
+        var categories = await CategoryRepository.ListAsync();
+        
+        _items = GetAllHierarchy(categories).ToList();
+        _categories = categories.OrderBy(category => category.Name).ToList();
     }
 
-    async Task<IReadOnlyCollection<TreeItemData<Category>>> LoadServerData(Category parent) => await Queries.GetAllChildren(parent.Id).ToListAsync();
+    static IEnumerable<TreeItemData<Category>> GetAllHierarchy(List<Category> categories)
+    {
+        var lookup = categories.ToLookup(c => c.ParentId);
+    
+        foreach (var item in BuildTree(null))yield return item;
 
-    static void OnItemsLoaded(TreeItemData<Category> treeItemData, IReadOnlyCollection<TreeItemData<Category?>>? children) =>
-        treeItemData.Children = (children?.ToList() ?? [])!;
+        yield break;
 
+        IEnumerable<TreeItemData<Category>> BuildTree(Guid? parentId)
+        {
+            foreach (var category in lookup[parentId].OrderBy(c => c.Name))
+            {
+                var children = BuildTree(category.Id).ToList();
+                var item = new TreeItemData<Category>
+                {
+                    Text = category.Name,
+                    Value = category,
+                    Expandable = children.Any(),
+                    Children = children
+                };
+                yield return item;
+            }
+        }
+    }
+    
     async Task OnTextChanged(string searchPhrase)
     {
         _searchPhrase = searchPhrase;
@@ -82,20 +104,25 @@
 
     Task<bool> MatchesName(TreeItemData<Category> item)
     {
-        var filterd = string.IsNullOrEmpty(item.Text) || item.Text.Contains(_searchPhrase, StringComparison.OrdinalIgnoreCase);
-        return Task.FromResult(filterd);
+        var match = string.IsNullOrEmpty(item.Text) || item.Text.Contains(_searchPhrase, StringComparison.OrdinalIgnoreCase);
+        return Task.FromResult(match);
     }
 
-    async Task ExpandAll()
+    async Task OpenCreateCategoryDialog(Guid? parentId = null)
     {
-        InitialTreeItems = await Queries.GetAllHierarchy().ToListAsync();
+        await CategoryDialogService.OpenCreateCategoryDialog("Creare Category", _categories, parentId);
         StateHasChanged();
-        _treeView?.ExpandAllAsync();
     }
 
-    Task CollapseAll() => _treeView?.CollapseAllAsync() ?? Task.CompletedTask;
+    async Task OpenEditCategoryDialog(Category category)
+    {
+        await CategoryDialogService.OpenEditCategoryDialog("Edit Category", _categories, category);
+        StateHasChanged();
+    }
 
-    Task OpenCreateCategoryDialog(Guid? parentId = null) => CategoryDialogService.OpenCreateCategoryDialog("Creare Category", parentId);
-    Task OpenEditCategoryDialog(Category category) => CategoryDialogService.OpenEditCategoryDialog("Edit Category", category);
-    Task OpenDeleteCategoryDialog(Category category) => CategoryDialogService.OpenDeleteDialogAsync(category,"Delete", "Do you really want to delete these records? This process cannot be undone.", "Delete Category?");
+    async Task OpenDeleteCategoryDialog(Category category)
+    {
+        await CategoryDialogService.OpenDeleteDialogAsync(category, "Delete", $@"Do you really want to delete ""{category.Name}"" category? This process cannot be undone.", "Delete Category?");
+        StateHasChanged();
+    }
 }

@@ -11,10 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlbyOnContainers.ProductDat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlbyOnContainers.ProductDataManager.Infrastructure", "src\AlbyOnContainers.ProductDataManager.Infrastructure\AlbyOnContainers.ProductDataManager.Infrastructure.csproj", "{6B71BE91-6AED-4A31-976B-0ADB808B18D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlbyOnContainers.ProductDataManager.Queries", "AlbyOnContainers.ProductDataManager.Queries\AlbyOnContainers.ProductDataManager.Queries.csproj", "{74419DB0-F13E-43B5-A74B-3603E1B39B86}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlbyOnContainers.ProductDataManager.Commands", "AlbyOnContainers.ProductDataManager.Commands\AlbyOnContainers.ProductDataManager.Commands.csproj", "{49BBD7E0-FFCA-482E-8109-A968CEAC67BD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,20 +32,10 @@ Global
 		{6B71BE91-6AED-4A31-976B-0ADB808B18D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B71BE91-6AED-4A31-976B-0ADB808B18D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B71BE91-6AED-4A31-976B-0ADB808B18D8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{74419DB0-F13E-43B5-A74B-3603E1B39B86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{74419DB0-F13E-43B5-A74B-3603E1B39B86}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{74419DB0-F13E-43B5-A74B-3603E1B39B86}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{74419DB0-F13E-43B5-A74B-3603E1B39B86}.Release|Any CPU.Build.0 = Release|Any CPU
-		{49BBD7E0-FFCA-482E-8109-A968CEAC67BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{49BBD7E0-FFCA-482E-8109-A968CEAC67BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{49BBD7E0-FFCA-482E-8109-A968CEAC67BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{49BBD7E0-FFCA-482E-8109-A968CEAC67BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BB367953-D850-423F-9254-23C3C483F1D6} = {BD59D53B-6E14-4ECB-B064-18BC4ACD0AB5}
 		{0C675B15-306F-431B-BFB8-2301CAC9CB53} = {BD59D53B-6E14-4ECB-B064-18BC4ACD0AB5}
 		{6B71BE91-6AED-4A31-976B-0ADB808B18D8} = {BD59D53B-6E14-4ECB-B064-18BC4ACD0AB5}
-		{49BBD7E0-FFCA-482E-8109-A968CEAC67BD} = {BD59D53B-6E14-4ECB-B064-18BC4ACD0AB5}
-		{74419DB0-F13E-43B5-A74B-3603E1B39B86} = {BD59D53B-6E14-4ECB-B064-18BC4ACD0AB5}
 	EndGlobalSection
 EndGlobal

@@ -19,8 +19,6 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AlbyOnContainers.ProductDataManager.Commands\AlbyOnContainers.ProductDataManager.Commands.csproj" />
-    <ProjectReference Include="..\..\AlbyOnContainers.ProductDataManager.Queries\AlbyOnContainers.ProductDataManager.Queries.csproj" />
     <ProjectReference Include="..\AlbyOnContainers.ProductDataManager.Infrastructure\AlbyOnContainers.ProductDataManager.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
