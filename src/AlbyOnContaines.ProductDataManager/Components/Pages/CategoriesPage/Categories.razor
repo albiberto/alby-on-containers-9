@@ -8,10 +8,14 @@
 <PageTitle>Categories</PageTitle>
 <MudText Typo="Typo.h3" GutterBottom="true">Categories</MudText>
 
-<MudButton OnClick="@(() => OpenCreateCategoryDialog())" Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Outlined.AddCircleOutline">Add Category</MudButton>
+<div class="d-flex flex-row reverse">
+ <MudButton OnClick="@(() => OpenCreateCategoryDialog())" Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Outlined.AddCircleOutline">Add Category</MudButton>
+ <MudButton OnClick="@ExpandAll" Color="Color.Secondary"  Variant="Variant.Text">Expand All</MudButton>
+ <MudButton OnClick="@CollapseAll" Color="Color.Secondary" Variant="Variant.Text">Collapse All</MudButton>
+</div>
 
 <MudPaper Class="w-100" Elevation="0">
-    <MudTextField T="string" Label="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" TextChanged="OnTextChanged" Immediate="true" Clearable="true"/>
+    <MudTextField T="string" Label="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" TextChanged="OnTextChanged" Immediate="false" Clearable="true"/>
     <MudTreeView @ref="_treeView" ServerData="@LoadServerData" Items="@InitialTreeItems" FilterFunc="MatchesName" Class="w-100">
         <ItemTemplate Context="context">
             <MudTreeViewItem
@@ -54,13 +58,18 @@
     [Inject] ISnackbar Snackbar { get; set; } = null!;
     [Inject] CategoryDialogService CategoryDialogService { get; set; } = null!;
 
-    List<TreeItemData<Category>> InitialTreeItems { get; set; } = [];
     MudTreeView<Category>? _treeView;
+    List<TreeItemData<Category>> InitialTreeItems { get; set; } = [];
     string _searchPhrase = string.Empty;
 
-    protected override async Task OnInitializedAsync() => InitialTreeItems = await Queries.GetAllParents();
+    protected override async Task OnInitializedAsync()
+    {
+        // InitialTreeItems = await Queries.GetAllHierarchy().ToListAsync();
 
-    async Task<IReadOnlyCollection<TreeItemData<Category>>> LoadServerData(Category parent) => await Queries.GetAllChildren(parent.Id);
+        InitialTreeItems = await Queries.GetAllParents().ToListAsync();
+    }
+
+    async Task<IReadOnlyCollection<TreeItemData<Category>>> LoadServerData(Category parent) => await Queries.GetAllChildren(parent.Id).ToListAsync();
 
     static void OnItemsLoaded(TreeItemData<Category> treeItemData, IReadOnlyCollection<TreeItemData<Category?>>? children) =>
         treeItemData.Children = (children?.ToList() ?? [])!;
@@ -71,8 +80,20 @@
         if (_treeView is not null) await _treeView.FilterAsync();
     }
 
-    Task<bool> MatchesName(TreeItemData<Category> item) =>
-        Task.FromResult(string.IsNullOrEmpty(item.Text) || item.Text.Contains(_searchPhrase, StringComparison.OrdinalIgnoreCase));
+    Task<bool> MatchesName(TreeItemData<Category> item)
+    {
+        var filterd = string.IsNullOrEmpty(item.Text) || item.Text.Contains(_searchPhrase, StringComparison.OrdinalIgnoreCase);
+        return Task.FromResult(filterd);
+    }
+
+    async Task ExpandAll()
+    {
+        InitialTreeItems = await Queries.GetAllHierarchy().ToListAsync();
+        StateHasChanged();
+        _treeView?.ExpandAllAsync();
+    }
+
+    Task CollapseAll() => _treeView?.CollapseAllAsync() ?? Task.CompletedTask;
 
     Task OpenCreateCategoryDialog(Guid? parentId = null) => CategoryDialogService.OpenCreateCategoryDialog("Creare Category", parentId);
     Task OpenEditCategoryDialog(Category category) => CategoryDialogService.OpenEditCategoryDialog("Edit Category", category);
