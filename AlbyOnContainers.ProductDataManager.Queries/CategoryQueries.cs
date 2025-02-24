@@ -15,9 +15,11 @@ public class CategoryQueries(ICategoryRepository repository)
     {
         var categories = await repository.GetAll()
                              .Select(category => (category.Id, Name: category.Name))
+                             .OrderBy(category => category.Name)
                              .ToListAsync();
 
-        categories.Insert(0, (Guid.Empty, "Root")); // Aggiunge "Root" all'inizio della lista
+        categories.Insert(0, (Guid.Empty, "Root"));
+        
         return categories;
     }
 

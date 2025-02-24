@@ -49,8 +49,8 @@
     }
 
     static Guid SelectedParent(Guid? guid) => guid ?? Guid.Empty;
-    
     void ParentChanged(Guid parent) => Category.ParentId = parent == Guid.Empty ? null : parent;
+    
     void Cancel() => MudDialog.Cancel();
     void Save() => MudDialog.Close(DialogResult.Ok(Category.Id));
 }

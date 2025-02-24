@@ -6,7 +6,10 @@
     <div style="display: flex; gap: 1rem;">
         <MudIconButton Icon="@Icons.Material.Outlined.AddCircleOutline" Size="Size.Medium" Color="Color.Inherit" OnClick="@Create"/>
         <MudIconButton Icon="@Icons.Material.Outlined.Edit" Size="Size.Medium" Color="Color.Inherit" OnClick="Edit"/>
-        <MudIconButton Icon="@Icons.Material.Outlined.Delete" Size="Size.Medium" Color="Color.Inherit" OnClick="() => Delete()"/>
+        @if (Delete is not null)
+        {
+            <MudIconButton Icon="@Icons.Material.Outlined.Delete" Size="Size.Medium" Color="Color.Inherit" OnClick="Delete"/>
+        }
     </div>
 </div>
 
@@ -14,6 +17,5 @@
     [Parameter] public required RenderFragment ChildContent { get; set; }
     [Parameter] public required EventCallback Create { get; set; }
     [Parameter] public required EventCallback Edit { get; set; }
-    
-    private void Delete() => Console.WriteLine("Elimina");
+    [Parameter] public Func<Task>? Delete { get; set; }
 }

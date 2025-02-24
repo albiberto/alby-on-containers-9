@@ -11,4 +11,10 @@ public class CategoryCommands(ICategoryRepository repository)
     }
     
     public Task UpdateRootCategoryAsync() => repository.SaveChangesAsync();
+
+    public async Task DeleteCategoryAsync(Category category)
+    {
+        repository.DeleteAsync(category);
+        await repository.SaveChangesAsync();
+    }
 }

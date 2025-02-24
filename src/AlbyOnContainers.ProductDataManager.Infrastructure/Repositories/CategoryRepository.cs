@@ -17,5 +17,7 @@ public class CategoryRepository(ProductContext context): ICategoryRepository
 
     public async Task CreateAsync(Category category) => await context.AddAsync(category);
 
+    public void DeleteAsync(Category category) => context.Categories.Remove(category);
+
     public Task<int> SaveChangesAsync() => context.SaveChangesAsync();
 }

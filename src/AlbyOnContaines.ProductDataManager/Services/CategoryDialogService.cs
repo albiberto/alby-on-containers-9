@@ -5,7 +5,7 @@ using MudBlazor;
 
 namespace AlbyOnContaines.ProductDataManager.Services;
 
-public class CategoryDialogService(CategoryCommands commands, IDialogService service)
+public class CategoryDialogService(CategoryCommands commands, IDialogService dialog) : DialogServiceBase(dialog)
 {
     public async Task OpenCreateCategoryDialog(string title, Guid? parentId = null)
     {
@@ -15,9 +15,8 @@ public class CategoryDialogService(CategoryCommands commands, IDialogService ser
         };
         
         var parameters = new DialogParameters<CategoryDialog> { { x => x.Category, category } };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
         
-        var dialog = await service.ShowAsync<CategoryDialog>(title, parameters, options);
+        var dialog = await Dialog.ShowAsync<CategoryDialog>(title, parameters, Options);
         var result = await dialog.Result;
 
         if (result?.Canceled ?? false) return;
@@ -28,13 +27,21 @@ public class CategoryDialogService(CategoryCommands commands, IDialogService ser
     public async Task OpenEditCategoryDialog(string title, Category category)
     {
         var parameters = new DialogParameters<CategoryDialog> { { x => x.Category, category } };
-        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true };
         
-        var dialog = await service.ShowAsync<CategoryDialog>(title, parameters, options);
+        var dialog = await Dialog.ShowAsync<CategoryDialog>(title, parameters, Options);
         var result = await dialog.Result;
 
         if (result?.Canceled ?? false) return;
 
         await commands.UpdateRootCategoryAsync();
+    }
+
+    public async Task OpenDeleteDialogAsync(Category category, string button, string content, string? title = null)
+    {
+        var result = await OpenDeleteDialogAsync(button, content, title);
+        
+        if (result?.Canceled ?? false) return;
+
+        await commands.DeleteCategoryAsync(category);
     }
 }

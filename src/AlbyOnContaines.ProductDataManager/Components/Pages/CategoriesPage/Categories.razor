@@ -22,12 +22,26 @@
                 CanExpand="@context.Expandable"
                 LoadingIconColor="Color.Info">
                 <BodyContent Context="item">
-                    <EditDisplay 
-                        Create="@(() => OpenCreateCategoryDialog(item.Value!.Id))"
-                        Edit="@(() => OpenEditCategoryDialog(item.Value!))">
-                        <MudText>@item.Value!.Name</MudText>
-                        <MudText>@item.Value!.Description</MudText>
-                    </EditDisplay>
+                    @if (item.Value!.HasChildren)
+                    {
+                     
+                        <EditDisplay 
+                            Create="@(() => OpenCreateCategoryDialog(item.Value!.Id))"
+                            Edit="@(() => OpenEditCategoryDialog(item.Value!))">
+                            <MudText>@item.Value!.Name</MudText>
+                            <MudText>@item.Value!.Description</MudText>
+                        </EditDisplay>
+                    }
+                    else
+                    {
+                        <EditDisplay 
+                            Create="@(() => OpenCreateCategoryDialog(item.Value!.Id))"
+                            Edit="@(() => OpenEditCategoryDialog(item.Value!))"
+                            Delete="@(() => OpenDeleteCategoryDialog(item.Value!))">
+                            <MudText>@item.Value!.Name</MudText>
+                            <MudText>@item.Value!.Description</MudText>
+                        </EditDisplay>
+                    }
                 </BodyContent>
             </MudTreeViewItem>
         </ItemTemplate>
@@ -62,4 +76,5 @@
 
     Task OpenCreateCategoryDialog(Guid? parentId = null) => CategoryDialogService.OpenCreateCategoryDialog("Creare Category", parentId);
     Task OpenEditCategoryDialog(Category category) => CategoryDialogService.OpenEditCategoryDialog("Edit Category", category);
+    Task OpenDeleteCategoryDialog(Category category) => CategoryDialogService.OpenDeleteDialogAsync(category,"Delete", "Do you really want to delete these records? This process cannot be undone.", "Delete Category?");
 }
