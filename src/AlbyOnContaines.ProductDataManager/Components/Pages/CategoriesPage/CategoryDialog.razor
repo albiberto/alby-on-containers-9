@@ -15,12 +15,17 @@
                 <MudSelectItem Value="false">No</MudSelectItem>
             </MudSelect>
             
-            <MudSelect T="Guid" Label="Parent" Value="@SelectedParent(Category.ParentId)" ValueChanged="ParentChanged">
-                @foreach (var category in Categories.Where(category => category.Id != Category.Id))
-                {
-                    <MudSelectItem Value="@category.Id">@category.Name</MudSelectItem>
-                }
-            </MudSelect>
+            <MudAutocomplete T="Category"
+                             @bind-Value="Category.Parent"
+                             SearchFunc="Search"
+                             ToStringFunc="@(category => category?.Name ?? string.Empty)"
+                             Variant="Variant.Text"
+                             MaxItems="Int32.MaxValue"
+                             Label="Parent Category"
+                             Margin="Margin.None"
+                             HelperText="Type at least 3 characters"
+                             HelperTextOnFocus="true"
+                             Clearable="true" />
 
         </div>
     </DialogContent>
@@ -43,9 +48,15 @@
             Category.Disable();
     }
 
-    static Guid SelectedParent(Guid? guid) => guid ?? Guid.Empty;
-    void ParentChanged(Guid parent) => Category.ParentId = parent == Guid.Empty ? null : parent;
-    
+    private Task<IEnumerable<Category>> Search(string value, CancellationToken token)
+    {
+        var result = string.IsNullOrEmpty(value)
+                   ? Categories
+                   : Categories.Where(category => category.Name.Contains(value));
+
+        return Task.FromResult(result);
+    }
+
     void Cancel() => MudDialog.Cancel();
     void Save() => MudDialog.Close(DialogResult.Ok(Category.Id));
 }

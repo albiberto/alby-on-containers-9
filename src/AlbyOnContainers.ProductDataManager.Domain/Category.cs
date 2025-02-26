@@ -11,7 +11,7 @@ public class Category(string name, string description, Guid? parentId = null, bo
     public string Name { get; set; } = name;
     public string Description { get; set; } = description;
     public Guid? ParentId { get; set; } = parentId;
-    public Category? Parent { get; private set; }
+    public Category? Parent { get; set; }
 
     List<Category> _children = [];
     public ICollection<Category> Children => _children;

@@ -110,19 +110,27 @@
 
     async Task OpenCreateCategoryDialog(Guid? parentId = null)
     {
-        await CategoryDialogService.OpenCreateCategoryDialog("Creare Category", _categories, parentId);
+        var category = await CategoryDialogService.OpenCategoryDialog("Creare Category", _categories, parentId);
+        
+        if(category is null) return;
+        _categories.Add(category);
+        _items = GetAllHierarchy(_categories).ToList();
         StateHasChanged();
     }
 
     async Task OpenEditCategoryDialog(Category category)
     {
-        await CategoryDialogService.OpenEditCategoryDialog("Edit Category", _categories, category);
+        await CategoryDialogService.OpenCategoryDialog("Edit Category", _categories, category);
         StateHasChanged();
     }
 
     async Task OpenDeleteCategoryDialog(Category category)
     {
         await CategoryDialogService.OpenDeleteDialogAsync(category, "Delete", $@"Do you really want to delete ""{category.Name}"" category? This process cannot be undone.", "Delete Category?");
+
+        _categories.Remove(category);
+        _items = GetAllHierarchy(_categories).ToList();
+
         StateHasChanged();
     }
 }
