@@ -1,5 +1,4 @@
 ﻿@using AlbyOnContainers.ProductDataManager.Domain
-
 <MudDialog>
     <DialogContent>
         <div class="d-flex flex-column">
@@ -9,24 +8,21 @@
             }
             <MudTextField @bind-Value="@Category.Name" Label="Name" Placeholder="Insert category name" Class="pt-2" Clearable="true" MaxLength="30"/>
             <MudTextField @bind-Value="@Category.Description" Label="Description" Placeholder="Insert category description" Class="pt-2" Clearable="true" MaxLength="512"/>
-            
+
             <MudSelect T="bool" Value="@Category.Enabled" ValueChanged="EnableChanged" Label="Enabled" Class="pt-2">
                 <MudSelectItem Value="true">Yes</MudSelectItem>
                 <MudSelectItem Value="false">No</MudSelectItem>
             </MudSelect>
-            
-            <MudAutocomplete T="Category"
-                             @bind-Value="Category.Parent"
+
+            <MudAutocomplete T="Guid?"
+                             @bind-Value="@Category.ParentId"
                              SearchFunc="Search"
-                             ToStringFunc="@(category => category?.Name ?? string.Empty)"
+                             ToStringFunc="ToStringFunc"
                              Variant="Variant.Text"
-                             MaxItems="Int32.MaxValue"
+                             MaxItems="int.MaxValue"
                              Label="Parent Category"
                              Margin="Margin.None"
-                             HelperText="Type at least 3 characters"
-                             HelperTextOnFocus="true"
-                             Clearable="true" />
-
+                             Clearable="true"/>
         </div>
     </DialogContent>
     <DialogActions>
@@ -40,6 +36,11 @@
     [Parameter] public required Category Category { get; set; }
     [Parameter] public required IReadOnlyCollection<Category> Categories { get; set; } = [];
 
+    // protected override void OnInitialized() => _selectedValue = Category.ParentId;
+    //
+    // Guid? _selectedValue;
+    // void ValueChanged(Guid? value) => _selectedValue = value;
+
     private void EnableChanged(bool @checked)
     {
         if (@checked)
@@ -48,15 +49,20 @@
             Category.Disable();
     }
 
-    private Task<IEnumerable<Category>> Search(string value, CancellationToken token)
+    private Task<IEnumerable<Guid?>> Search(string value, CancellationToken token)
     {
         var result = string.IsNullOrEmpty(value)
-                   ? Categories
-                   : Categories.Where(category => category.Name.Contains(value));
+                         ? Categories
+                         : Categories
+                             .Where(category => category.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
 
-        return Task.FromResult(result);
+        return Task.FromResult(result.Select(category => category.Id as Guid?));
     }
 
+    private string? ToStringFunc(Guid? id) => id is null 
+                                                  ? string.Empty 
+                                                  : Categories.Single(category => category.Id == id).Name;
+    
     void Cancel() => MudDialog.Cancel();
     void Save() => MudDialog.Close(DialogResult.Ok(Category.Id));
 }
