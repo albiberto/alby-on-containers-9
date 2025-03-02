@@ -5,9 +5,9 @@ using MudBlazor;
 
 namespace AlbyOnContaines.ProductDataManager.Specifications;
 
-public sealed class DescriptionSpecification : Specification<DescriptionType>
+public sealed class DescriptionGridSpecification : Specification<DescriptionType>
 {
-    public DescriptionSpecification(GridState<DescriptionType> state, string? searchString = null)
+    public DescriptionGridSpecification(GridState<DescriptionType> state, string? searchString = null)
     {
         Query
             .Include(type => type.Values)

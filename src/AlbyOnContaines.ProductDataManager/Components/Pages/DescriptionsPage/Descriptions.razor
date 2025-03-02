@@ -7,7 +7,7 @@
 @using AlbyOnContainers.ProductDataManager.Infrastructure.Repositories
 @using AlbyOnContaines.ProductDataManager.Specifications
 
-<MudDataGrid @ref="_dataGrid" T="DescriptionType" ServerData="ServerReload" Filterable="true">
+<MudDataGrid @ref="_dataGrid" T="DescriptionType" ServerData="ServerReload" SortMode="SortMode.Multiple" >
     <ToolBarContent>
         <MudText Typo="Typo.h6">Periodic Elements</MudText>
         <MudSpacer />
@@ -37,11 +37,11 @@
 
     private async Task<GridData<DescriptionType>> ServerReload(GridState<DescriptionType> state)
     {
-        var items = await Repository.ListAsync(new DescriptionSpecification(state, _searchString));
+        var items = await Repository.ListAsync(new DescriptionGridSpecification(state, _searchString));
         
         return new()
         {
-            TotalItems = 2,
+            TotalItems = await Repository.CountAsync(),
             Items = items
         };
     }
