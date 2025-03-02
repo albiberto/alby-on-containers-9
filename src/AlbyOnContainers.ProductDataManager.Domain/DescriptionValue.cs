@@ -10,7 +10,7 @@ public class DescriptionValue(string value, string description, Guid description
     string _description = description;
     public string Description { get => _description; set => _description = value.Trim(); }
 
-    public Guid DescriptionTypeId { get; set; } = descriptionTypeId;
+    public Guid DescriptionTypeId { get; private set; } = descriptionTypeId;
     public DescriptionType? DescriptionType { get; set; }
 
 }

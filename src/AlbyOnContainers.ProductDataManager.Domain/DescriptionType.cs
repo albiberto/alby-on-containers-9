@@ -9,6 +9,9 @@ public class DescriptionType(string name, string description, bool enabled = tru
     
     string _description = description;
     public string Description { get => _description; set => _description = value.Trim(); }
+
+    readonly List<DescriptionValue> _values = [];
+    public ICollection<DescriptionValue> Values => _values;
     
     readonly List<Category> _categories = [];
     public ICollection<Category> Categories => _categories;

@@ -3,4 +3,4 @@ using Ardalis.Specification.EntityFrameworkCore;
 
 namespace AlbyOnContainers.ProductDataManager.Infrastructure.Repositories;
 
-public class CategoryRepository(ProductContext context) : RepositoryBase<Category>(context);
+public class DescriptionRepository(ProductContext context) : RepositoryBase<DescriptionType>(context);
