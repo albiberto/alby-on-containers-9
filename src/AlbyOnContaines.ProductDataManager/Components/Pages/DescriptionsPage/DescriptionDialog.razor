@@ -1,0 +1,38 @@
+﻿@using AlbyOnContainers.ProductDataManager.Domain
+<MudDialog>
+    <DialogContent>
+        <div class="d-flex flex-column">
+            @if (Type.Id != Guid.Empty)
+            {
+                <MudTextField Value="@Type.Id.ToString()" Label="Identifier" ReadOnly="true"/>
+            }
+            <MudTextField @bind-Value="@Type.Name" Label="Name" Placeholder="Insert type name" Class="pt-2" Clearable="true" MaxLength="30"/>
+            <MudTextField @bind-Value="@Type.Description" Label="Description" Placeholder="Insert type description" Class="pt-2" Clearable="true" MaxLength="512"/>
+
+            <MudSelect T="bool" Value="@Type.Enabled" ValueChanged="EnableChanged" Label="Enabled" Class="pt-2">
+                <MudSelectItem Value="true">Yes</MudSelectItem>
+                <MudSelectItem Value="false">No</MudSelectItem>
+            </MudSelect>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public required IMudDialogInstance MudDialog { get; set; }
+    [Parameter] public required DescriptionType Type { get; set; }
+    
+    private void EnableChanged(bool @checked)
+    {
+        if (@checked)
+            Type.Enable();
+        else
+            Type.Disable();
+    }
+    
+    void Cancel() => MudDialog.Cancel();
+    void Save() => MudDialog.Close(DialogResult.Ok(Type.Id));
+}

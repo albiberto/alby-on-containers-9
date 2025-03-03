@@ -1,0 +1,13 @@
+﻿@using AlbyOnContainers.ProductDataManager.Domain
+
+<MudDataGrid Items="@Values" EditMode="DataGridEditMode.Cell" EditTrigger="DataGridEditTrigger.OnRowClick">
+    <Columns>
+        <PropertyColumn Property="x => x.Value" />
+        <PropertyColumn Property="x => x.Description" />
+    </Columns>
+</MudDataGrid>
+
+@code
+{
+    [Parameter] public required IEnumerable<DescriptionValue> Values { get; set; }
+}

@@ -9,7 +9,11 @@ public static class Bootstrapper
 {
     public static void AddServices(this IHostApplicationBuilder builder)
     {
-        builder.Services.AddScoped<CategoryDialogService>();
+        builder.Services.Scan(scan => scan
+                                  .FromAssemblyOf<DialogServiceBase>()
+                                  .AddClasses(classes => classes.InExactNamespaceOf<DialogServiceBase>())
+                                  .AsSelf()
+                                  .WithScopedLifetime());
         
         builder.AddInfrastructure();
     }

@@ -4,6 +4,10 @@ namespace AlbyOnContainers.ProductDataManager.Domain;
 
 public class DescriptionType(string name, string description, bool enabled = true, Guid id = default) : Entity(id, enabled)
 {
+    public DescriptionType() : this(string.Empty, string.Empty)
+    {
+    }
+    
     string _name = name;
     public string Name { get => _name; set => _name = value.Trim(); }
     

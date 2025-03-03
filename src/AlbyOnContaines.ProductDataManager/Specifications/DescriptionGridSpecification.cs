@@ -14,13 +14,18 @@ public sealed class DescriptionGridSpecification : Specification<DescriptionType
             .Include(type => type.Categories);
 
         if (!string.IsNullOrEmpty(searchString))
+        {
+            var lowerSearchString = searchString.ToLower();
+    
             Query.Where(type =>
-                            type.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase) ||
-                            type.Description.Contains(searchString, StringComparison.InvariantCultureIgnoreCase) ||
+                            type.Name.ToLower().Contains(lowerSearchString) ||
+                            type.Description.ToLower().Contains(lowerSearchString) ||
                             type.Values.Any(v =>
-                                                v.Value.Contains(searchString, StringComparison.InvariantCultureIgnoreCase) ||
-                                                v.Description.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
+                                                v.Value.ToLower().Contains(lowerSearchString) ||
+                                                v.Description.ToLower().Contains(lowerSearchString)
+                                           )
                        );
+        }
         
         ApplySorting(Query, state);
 
